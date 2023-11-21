@@ -21,6 +21,8 @@ It also supports output in Markdown format. This is intended to allow data to be
 ## HowToUse
 
 ```python
+import requests
+from main_content_extractor import MainContentExtractor
 
 # Get HTML using requests
 url = "https://developer.mozilla.org/ja/docs/Web"

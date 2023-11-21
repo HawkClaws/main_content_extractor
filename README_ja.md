@@ -23,6 +23,8 @@ XMLからHTMLへの変換は不可逆的なものであり、完全に元のデ�
 ## HowToUse
 
 ```python
+import requests
+from main_content_extractor import MainContentExtractor
 
 # Get HTML using requests
 url = "https://developer.mozilla.org/ja/docs/Web"
