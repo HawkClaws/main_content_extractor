@@ -2,17 +2,17 @@
 
 ## Description
 
-このライブラリは、HTMLからメインコンテンツのみを抽出するためのものです。<br>LLMに関する情報や、LangChainやLlamaIndexへのデータ投入用に開発しました。<br>
+This library is designed to extract only the main content from HTML.<br>
+Developed for information on LLM and for feeding data into LangChain and LlamaIndex.<br>
 <br>
-メインコンテンツの抽出には`trafilatura`が使用されています。<br>
-`trafilatura`ではHTML形式での出力ができないため、HTML情報が含まれたXML形式で出力され、その後HTMLに変換されています。<br>
-XMLからHTMLへの変換は不可逆的なものであり、完全に元のデータと一致するわけではありません。<br>
+The `trafilatura` is used to extract the main content.<br>
+Since `trafilatura` does not allow output in HTML format, the output is in XML format with HTML information and then converted to HTML.<br>
+The XML to HTML conversion is irreversible and does not completely match the original data.<br>
 <br>
-本ライブラリはHTMLの要素情報や階層情報が含まれているため、これらを利用する際に有用です。<br>
+This library contains HTML element and hierarchical information, which is useful when using these elements.<br>
+For example, it is useful to get a list of links or headings for the main content.<br>
 <br>
-例えば、メインコンテンツのリンク一覧や見出しを取得する際に役立ちます。<br>
-<br>
-また、Markdown形式での出力もサポートしています。これは、よりLLMで扱いやすい形式でデータを出力できるようにするためのものです。
+It also supports output in Markdown format. This is intended to allow data to be output in a format more easily handled by LLM.
 
 ## Installration
 
@@ -40,9 +40,9 @@ extracted_html = MainContentExtractor.extract(INPUT_TESTDATA, include_images=Tru
 
 ```
 
-extractの引数である`**kwargs`は、直接`trafilatura`の`extract`に渡されます。<br>
-そのため、`trafilatura`の`extract`で使用可能な引数はすべて利用できます。<br>
-具体的な引数については[trafilatura-doc](https://trafilatura.readthedocs.io/en/latest/corefunctions.html#extraction)を参照してください。<br>
+The `**kwargs` argument of `extract` is passed directly to `extract` in `trafilatura`.<br>
+Therefore, all available arguments for `extract` in `trafilatura` are available.<br>
+See [trafilatura-doc](https://trafilatura.readthedocs.io/en/latest/corefunctions.html#extraction) for specific arguments.<br>
 <br>
-extractの引数の`**kwargs`は直接`trafilatura`の`extract`に渡されます。<br>
-ただし、`trafilatura`の`extract`の引数である`output_format`は`xml`に固定されていますので、これを`trafilatura`の引数として渡すことはできません。
+The `**kwargs` argument of `extract` is passed directly to `extract` of `trafilatura`.<br>
+However, `trafilatura`'s `extract` argument, `output_format`, is fixed to `xml` and cannot be passed as an argument to `trafilatura`.
