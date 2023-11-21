@@ -7,8 +7,22 @@ from bs4 import BeautifulSoup
 
 class MainContentExtractor:
     @staticmethod
-    def extract(filecontent: str, output_format="html", **kwargs) -> str:
-        data = trafilatura.extract(filecontent, output_format="xml", **kwargs)
+    def extract(
+        filecontent: str,
+        output_format="html",
+        include_tables=True,
+        include_images=True,
+        include_links=True,
+        **kwargs,
+    ) -> str:
+        data = trafilatura.extract(
+            filecontent,
+            output_format="xml",
+            include_tables=include_tables,
+            include_images=include_images,
+            include_links=include_links,
+            **kwargs,
+        )
         if data == None:
             return None
         data = MainContentExtractor._replace_tags(data)
@@ -21,11 +35,7 @@ class MainContentExtractor:
 
     @staticmethod
     def _html_to_markdown(html_string: str) -> str:
-        h = html2text.HTML2Text()
-        h.body_width = 0
-
-        markdown_text = h.handle(html_string)
-        return markdown_text
+        return html2text.html2text(html_string, bodywidth=0)
 
     @staticmethod
     def _prettify_html(html_string: str) -> str:
