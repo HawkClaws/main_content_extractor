@@ -4,11 +4,13 @@ import trafilatura
 import html2text
 from bs4 import BeautifulSoup
 
-class MainContentExtractor:
 
+class MainContentExtractor:
     @staticmethod
-    def extract(filecontent: str, output_format="html", **kwargs):
+    def extract(filecontent: str, output_format="html", **kwargs) -> str:
         data = trafilatura.extract(filecontent, output_format="xml", **kwargs)
+        if data == None:
+            return None
         data = MainContentExtractor._replace_tags(data)
         data = MainContentExtractor._convert_xml_to_html(data)
         data = MainContentExtractor._prettify_html(data)
@@ -18,7 +20,7 @@ class MainContentExtractor:
             return MainContentExtractor._html_to_markdown(data)
 
     @staticmethod
-    def _html_to_markdown(html_string):
+    def _html_to_markdown(html_string: str) -> str:
         h = html2text.HTML2Text()
         h.body_width = 0
 
@@ -26,12 +28,12 @@ class MainContentExtractor:
         return markdown_text
 
     @staticmethod
-    def _prettify_html(html_string):
-        soup = BeautifulSoup(html_string, 'html.parser')
+    def _prettify_html(html_string: str) -> str:
+        soup = BeautifulSoup(html_string, "html.parser")
         return soup.prettify()
-    
+
     @staticmethod
-    def _replace_function(match):
+    def _replace_function(match) -> str:
         # dd-1 などの-1を取り除く
         rend_value = match.group(1)
         if "-" in rend_value:
@@ -39,10 +41,13 @@ class MainContentExtractor:
         return f"<{rend_value}>{match.group(2)}</{rend_value}>"
 
     @staticmethod
-    def _replace_tags(input_string):
+    def _replace_tags(input_string: str):
         patterns = [
             (r'<list rend="([^"]*)">([\s\S]*?)</list>', r"<\1>\2</\1>"),
-            (r'<item rend="([^"]+)">([\s\S]*?)</item>', MainContentExtractor._replace_function),
+            (
+                r'<item rend="([^"]+)">([\s\S]*?)</item>',
+                MainContentExtractor._replace_function,
+            ),
             (r"<item>([\s\S]*?)</item>", r"<li>\1</li>"),
             (r"<lb\s*/>", "<br />"),
             (r'<head rend="([^"]+)">([\s\S]*?)</head>', r"<\1>\2</\1>"),
@@ -63,7 +68,7 @@ class MainContentExtractor:
         return input_string
 
     @staticmethod
-    def _convert_xml_to_html(xml_string):
+    def _convert_xml_to_html(xml_string: str) -> str:
         # 解析してHTMLに変換
         root = ET.fromstring(xml_string)
         title = root.get("title") or ""
@@ -103,4 +108,3 @@ class MainContentExtractor:
         """
 
         return html_content
-    
