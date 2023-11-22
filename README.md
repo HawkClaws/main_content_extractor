@@ -46,5 +46,4 @@ The `**kwargs` argument of `extract` is passed directly to `extract` in `trafila
 Therefore, all available arguments for `extract` in `trafilatura` are available.<br>
 See [trafilatura-doc](https://trafilatura.readthedocs.io/en/latest/corefunctions.html#extraction) for specific arguments.<br>
 <br>
-The `**kwargs` argument of `extract` is passed directly to `extract` of `trafilatura`.<br>
 However, `trafilatura`'s `extract` argument, `output_format`, is fixed to `xml` and cannot be passed as an argument to `trafilatura`.
