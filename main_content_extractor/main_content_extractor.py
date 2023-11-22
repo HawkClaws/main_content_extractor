@@ -2,7 +2,6 @@ import re
 import xml.etree.ElementTree as ET
 import trafilatura
 import html2text
-from bs4 import BeautifulSoup
 
 
 class MainContentExtractor:
@@ -13,6 +12,7 @@ class MainContentExtractor:
         include_tables=True,
         include_images=True,
         include_links=True,
+        is_prettify_html=False,
         **kwargs,
     ) -> str:
         data = trafilatura.extract(
@@ -27,20 +27,68 @@ class MainContentExtractor:
             return None
         data = MainContentExtractor._replace_tags(data)
         data = MainContentExtractor._convert_xml_to_html(data)
-        data = MainContentExtractor._prettify_html(data)
         if output_format == "html":
+            if is_prettify_html:
+                data = MainContentExtractor._prettify_html(data)
             return data
         elif output_format == "markdown":
             return MainContentExtractor._html_to_markdown(data)
 
+    def extract_links(html_content):
+        extracted_html = MainContentExtractor.extract(
+            html_content, include_links=True, include_images=False
+        )
+        MainContentExtractor._check_require_module()
+        from bs4 import BeautifulSoup
+
+        soup = BeautifulSoup(extracted_html, "html.parser")
+
+        # aタグを検索して情報を抽出
+        links = {}
+        for a_tag in soup.find_all("a"):
+            link_text = a_tag.get_text()
+            link_url = a_tag.get("href")
+            links[link_url] = {"text": link_text, "url": link_url}
+
+        return links
+
+    def extract_images(html_content):
+        extracted_html = MainContentExtractor.extract(
+            html_content, include_links=False, include_images=True
+        )
+        MainContentExtractor._check_require_module()
+        from bs4 import BeautifulSoup
+
+        soup = BeautifulSoup(extracted_html, "html.parser")
+
+        # imgタグを検索して情報を抽出
+        images = {}
+        for img_tag in soup.find_all("img"):
+            image_alt = img_tag.get("alt", "")
+            image_url = img_tag.get("src")
+            images[image_url] = {"alt": image_alt, "url": image_url}
+
+        return images
     @staticmethod
     def _html_to_markdown(html_string: str) -> str:
         return html2text.html2text(html_string, bodywidth=0)
 
     @staticmethod
     def _prettify_html(html_string: str) -> str:
+        MainContentExtractor._check_require_module()
+        from bs4 import BeautifulSoup
+
         soup = BeautifulSoup(html_string, "html.parser")
         return soup.prettify()
+
+    @staticmethod
+    def _check_require_module():
+        try:
+            import bs4
+        except ImportError:
+            raise ImportError(
+                "`is_prettify_html` package not found, please run `pip install beautifulsoup4`"
+            )
 
     @staticmethod
     def _replace_function(match) -> str:

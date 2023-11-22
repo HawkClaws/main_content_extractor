@@ -5,7 +5,7 @@ setup(
     version="0.0.1",
     author="HawkClaws",
     packages=find_packages(),
-    install_requires=["trafilatura","html2text","beautifulsoup4"],
+    install_requires=["trafilatura","html2text"],
     include_package_data=True,
     url=""
 )
