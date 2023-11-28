@@ -2,19 +2,27 @@
 
 ## Description
 
-This library is designed to extract only the main content from HTML.<br>
-Developed for information on LLM and for feeding data into LangChain and LlamaIndex.<br>
+This library is designed for extracting only the main content from HTML.<br>
+It was developed for obtaining information related to LLM and for data input to LangChain and LlamaIndex.<br>
 <br>
-The `trafilatura` is used to extract the main content.<br>
-Since `trafilatura` does not allow output in HTML format, the output is in XML format with HTML information and then converted to HTML.<br>
-The XML to HTML conversion is irreversible and does not completely match the original data.<br>
+Since this library contains element information and hierarchy information of HTML, it is useful when utilizing them.<br>
+For example, it can be helpful in obtaining a list of links or headers from the main content.<br>
 <br>
-This library contains HTML element and hierarchical information, which is useful when using these elements.<br>
-For example, it is useful to get a list of links or headings for the main content.<br>
+While `trafilatura` is an excellent library for main content extraction, it has issues such as missing necessary data or inability to output HTML.<br>
+To address these problems, this library exists.<br>
 <br>
-It also supports output in Markdown format. This is intended to allow data to be output in a format more easily handled by LLM.
+The sequence of main content extraction is as follows:<br>
+<br>
+![image](content_extraction_sequence.png)
+<br>
+In addition to HTML format, output in Text format and Markdown format is also supported. This is to make it easier to output data in a format that is more convenient for LLM.<br>
+<br>
+The extraction of main content uses `trafilatura`.<br>
+Since `trafilatura` cannot output in HTML format, it is output in XML format containing HTML information and then converted to HTML.<br>
+The conversion from XML to HTML is irreversible and does not perfectly match the original data.<br>
+<br>
 
-## Installration
+## Installation
 
 `pip install git+https://github.com/HawkClaws/main_content_extractor.git`
 
@@ -34,16 +42,5 @@ content = response.text
 extracted_html = MainContentExtractor.extract(content)
 
 # Get HTML with main content extracted from Markdown
-extracted_markdown = MainContentExtractor.extract(content,output_format="markdown")
-
-# Get HTML with main content extracted from HTML 
-# (using trafilatura arguments include_images and include_links)
-extracted_html = MainContentExtractor.extract(INPUT_TESTDATA, include_images=True, include_links=True)
-
+extracted_markdown = MainContentExtractor.extract(content, output_format="markdown")
 ```
-
-The `**kwargs` argument of `extract` is passed directly to `extract` in `trafilatura`.<br>
-Therefore, all available arguments for `extract` in `trafilatura` are available.<br>
-See [trafilatura-doc](https://trafilatura.readthedocs.io/en/latest/corefunctions.html#extraction) for specific arguments.<br>
-<br>
-However, `trafilatura`'s `extract` argument, `output_format`, is fixed to `xml` and cannot be passed as an argument to `trafilatura`.

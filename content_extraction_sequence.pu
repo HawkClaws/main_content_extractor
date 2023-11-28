@@ -1,0 +1,23 @@
+@startuml
+start
+if (Is main element present?) then (yes)
+  :Extract "main element";
+else (no)
+  if (Is article element present?) then (yes)
+    :Extract "article element";
+  else (no)
+    :Get deepest level element data;
+    if (Is deepest_element_data present?) then (yes)
+      :Extract "deepest element_data";
+    else (no)
+      if (Is element ID "contents" or "main"?) then (yes)
+        :Extract "deepest element_data";
+      else (no)
+        :Extract using Trafilatura;
+        :Execute trafilatura.extract;
+      endif
+    endif
+  endif
+endif
+stop
+@enduml
