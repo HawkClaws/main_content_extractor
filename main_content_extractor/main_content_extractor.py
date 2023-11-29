@@ -14,11 +14,12 @@ REMOVE_ELEMENT_LIST_DEFAULT: List[str] = [
     "search",
 ]
 
+
 class MainContentExtractor:
     def extract(
         html: str,
         output_format: str = "html",
-        remove_element_list: List[str] = REMOVE_ELEMENT_LIST_DEFAULT,
+        include_links: bool = True,
         ref_extraction_method: dict = {},
     ) -> str:
         """
@@ -34,7 +35,7 @@ class MainContentExtractor:
             The extracted main content as a string.
         """
         soup = BeautifulSoup(html, "html.parser")
-        soup = MainContentExtractor._remove_elements(soup, remove_element_list)
+        soup = MainContentExtractor._remove_elements(soup, REMOVE_ELEMENT_LIST_DEFAULT)
 
         main_content = soup.find("main")
 
@@ -56,7 +57,9 @@ class MainContentExtractor:
             if articles:
                 result_html = "".join(str(article) for article in articles)
             else:
-                main_content = MainContentExtractor._get_deepest_element_data(soup, ["contents", "main"])
+                main_content = MainContentExtractor._get_deepest_element_data(
+                    soup, ["contents", "main"]
+                )
                 if main_content:
                     extraction_method = "deepest_element_data"
                     result_html = str(main_content)
@@ -64,23 +67,69 @@ class MainContentExtractor:
                     extraction_method = "trafilatura_extract"
                     result_html = TrafilaturaExtends.extract(str(soup))
 
-                    # extraction_method = "extract_html_text"
-                    # # TODO There is room for improvement
-                    # result_html = MainContentExtractor._extract_html_text(soup, ["p"])
-
         if result_html:
             soup = BeautifulSoup(result_html, "html.parser")
 
             if ref_extraction_method is not None:
                 ref_extraction_method["extraction_method"] = extraction_method
 
+            if output_format == "text":
+                return soup.get_text(strip=True)
+            
+            if include_links == False:
+                soup = MainContentExtractor._remove_elements_keep_text(soup, ["a"])
             if output_format == "html":
                 return soup.prettify()
-            elif output_format == "text":
-                return soup.get_text(strip=True)
             elif output_format == "markdown":
                 return html2text(str(soup))
 
+    def extract_links(html_content: str, **kwargs) -> dict:
+        """
+        Extracts links from HTML content and returns a dictionary with link information.
+
+        Args:
+            html_content (str): The HTML content from which to extract links.
+
+        Returns:
+            dict: A dictionary containing link information with link URLs as keys and a dictionary
+            with link text and URL as values.
+        """
+        extracted_html = MainContentExtractor.extract(html_content, **kwargs)
+        soup = BeautifulSoup(extracted_html, "html.parser")
+
+        links = {}
+        for a_tag in soup.find_all("a"):
+            link_text = a_tag.get_text(strip=True)
+            if not link_text:
+                continue
+            link_url = a_tag.get("href")
+            if not link_url:
+                continue
+            links[link_url] = {"text": link_text, "url": link_url}
+
+        return links
+
+    def extract_images(html_content: str, **kwargs) -> dict:
+        """
+        Extracts images from HTML content and returns a dictionary with image information.
+
+        Args:
+            html_content (str): The HTML content from which to extract images.
+
+        Returns:
+            dict: A dictionary containing image information with image URLs as keys and a dictionary
+            with image alt text and URL as values.
+        """
+        extracted_html = MainContentExtractor.extract(html_content, **kwargs)
+        soup = BeautifulSoup(extracted_html, "html.parser")
+
+        images = {}
+        for img_tag in soup.find_all("img"):
+            image_alt = img_tag.get("alt", "")
+            image_url = img_tag.get("src")
+            images[image_url] = {"alt": image_alt, "url": image_url}
+
+        return images
 
     def _remove_elements(soup: BeautifulSoup, elements: List[str]) -> BeautifulSoup:
         """
@@ -101,30 +150,13 @@ class MainContentExtractor:
 
         return soup
 
-
-    def _extract_html_text(soup: BeautifulSoup, target_elements: List[str]) -> str:
-        def remove_elements_keep_text(
-            soup: BeautifulSoup, allow_element_list: list
-        ) -> BeautifulSoup:
-            def remove_element(element: Tag) -> None:
-                if element.name not in allow_element_list:
-                    element.unwrap()
-
-            for element in soup.find_all():
-                remove_element(element)
-            return soup
-
-        filtered_elements = []
-
-        for element in soup.find_all(target_elements):
-            element: BeautifulSoup = element
-            if not element.get_text().strip():
-                continue
-
-            filtered_elements.append(remove_elements_keep_text(element, ["p", "a"]))
-
-        return "".join(str(element) for element in filtered_elements)
-
+    def _remove_elements_keep_text(
+        soup: BeautifulSoup, target_element_list: List[str]
+    ) -> BeautifulSoup:
+        for element in soup.find_all():
+            if element.name in target_element_list:
+                element.unwrap()
+        return soup
 
     def _get_deepest_element_data(
         soup: BeautifulSoup, target_ids: List[str]

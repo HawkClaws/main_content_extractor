@@ -29,43 +29,6 @@ class TrafilaturaExtends:
         data = TrafilaturaExtends._convert_xml_to_html(data)
         return data
 
-
-    def extract_links(html_content):
-        extracted_html = TrafilaturaExtends.extract(
-            html_content, include_links=True, include_images=False
-        )
-        TrafilaturaExtends._check_require_module()
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(extracted_html, "html.parser")
-
-        # aタグを検索して情報を抽出
-        links = {}
-        for a_tag in soup.find_all("a"):
-            link_text = a_tag.get_text()
-            link_url = a_tag.get("href")
-            links[link_url] = {"text": link_text, "url": link_url}
-
-        return links
-
-    def extract_images(html_content):
-        extracted_html = TrafilaturaExtends.extract(
-            html_content, include_links=False, include_images=True
-        )
-        TrafilaturaExtends._check_require_module()
-        from bs4 import BeautifulSoup
-
-        soup = BeautifulSoup(extracted_html, "html.parser")
-
-        # imgタグを検索して情報を抽出
-        images = {}
-        for img_tag in soup.find_all("img"):
-            image_alt = img_tag.get("alt", "")
-            image_url = img_tag.get("src")
-            images[image_url] = {"alt": image_alt, "url": image_url}
-
-        return images
-
     @staticmethod
     def _replace_function(match) -> str:
         # dd-1 などの-1を取り除く
