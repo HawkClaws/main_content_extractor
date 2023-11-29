@@ -34,6 +34,11 @@ class MainContentExtractor:
         Returns:
             The extracted main content as a string.
         """
+        valid_formats = ["html", "text", "markdown"]
+        
+        if output_format not in valid_formats:
+            raise ValueError(f"Invalid output_format: {output_format}. Valid formats are: {', '.join(valid_formats)}.")
+    
         soup = BeautifulSoup(html, "html.parser")
         soup = MainContentExtractor._remove_elements(soup, REMOVE_ELEMENT_LIST_DEFAULT)
 
