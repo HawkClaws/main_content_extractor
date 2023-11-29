@@ -28,9 +28,9 @@ class MainContentExtractor:
         Args:
             html: The HTML string to extract the main content from.
             output_format: The format of the extracted content (html, text, markdown).
-            remove_element_list: List of elements to remove from the HTML string.
+            include_links: Whether to include links in the extracted content.
             ref_extraction_method: A dictionary to store the reference to the extraction method.
-
+            
         Returns:
             The extracted main content as a string.
         """
