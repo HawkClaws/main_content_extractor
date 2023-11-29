@@ -77,7 +77,7 @@ class MainContentExtractor:
                 return soup.get_text(strip=True)
             
             if include_links == False:
-                soup = MainContentExtractor._remove_elements_keep_text(soup, ["a"])
+                soup = MainContentExtractor._remove_elements_keep_text(soup, ["a","img"])
             if output_format == "html":
                 return soup.prettify()
             elif output_format == "markdown":
