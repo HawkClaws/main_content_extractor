@@ -1,8 +1,13 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fp:
+    readme = fp.read()
+
+DESCRIPTION = "A library to extract the main content from html. Developed for information on LLM and for feeding data into LangChain and LlamaIndex."
+
 setup(
     name="MainContentExtractor",
-    version="0.0.1",
+    version="0.0.3",
     author="HawkClaws",
     packages=find_packages(),
     install_requires=[
@@ -12,6 +17,10 @@ setup(
     ],
     python_requires=">=3.6",
     include_package_data=True,
-    url="",
+    url="https://github.com/HawkClaws/main_content_extractor",
+    project_urls={"Source Code": "https://github.com/HawkClaws/main_content_extractor"},
+    description=DESCRIPTION,
+    long_description=readme,
+    long_description_content_type='text/markdown',
     license="MIT",
 )

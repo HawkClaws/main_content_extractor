@@ -13,7 +13,7 @@ To address these problems, this library exists.<br>
 <br>
 The sequence of main content extraction is as follows:<br>
 <br>
-![image](content_extraction_sequence.png)
+![image](https://raw.githubusercontent.com/HawkClaws/main_content_extractor/main/content_extraction_sequence.png)
 <br>
 In addition to HTML format, output in Text format and Markdown format is also supported. This is to make it easier to output data in a format that is more convenient for LLM.<br>
 <br>
