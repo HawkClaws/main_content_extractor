@@ -7,7 +7,7 @@ DESCRIPTION = "A library to extract the main content from html. Developed for in
 
 setup(
     name="MainContentExtractor",
-    version="0.0.3",
+    version="0.0.4",
     author="HawkClaws",
     packages=find_packages(),
     install_requires=[
