@@ -24,7 +24,7 @@ The conversion from XML to HTML is irreversible and does not perfectly match the
 
 ## Installation
 
-`pip install git+https://github.com/HawkClaws/main_content_extractor.git`
+`pip install MainContentExtractor`
 
 ## HowToUse
 
