@@ -31,7 +31,8 @@ class MainContentExtractor:
             output_format: The format of the extracted content (html, text, markdown).
             include_links: Whether to include links in the extracted content.
             ref_extraction_method: A dictionary to store the reference to the extraction method.
-            html2text_config: A dictionary with configuration options for the html2text library for markdown. View options here: https://github.com/Alir3z4/html2text/blob/master/docs/usage.md
+            **html2text_kwargs: Additional keyword arguments to be passed to the html2text library for markdown conversion.
+                View options here: https://github.com/Alir3z4/html2text/blob/master/docs/usage.md
 
         Returns:
             The extracted main content as a string.
