@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup, Tag
 from typing import List, Union
-from html2text import html2text
+import html2text
 from .trafilatura_extends import TrafilaturaExtends
 
 REMOVE_ELEMENT_LIST_DEFAULT: List[str] = [
@@ -21,6 +21,7 @@ class MainContentExtractor:
         output_format: str = "html",
         include_links: bool = True,
         ref_extraction_method: dict = {},
+        **html2text_kwargs
     ) -> str:
         """
         Extracts the main content from an HTML string.
@@ -30,17 +31,20 @@ class MainContentExtractor:
             output_format: The format of the extracted content (html, text, markdown).
             include_links: Whether to include links in the extracted content.
             ref_extraction_method: A dictionary to store the reference to the extraction method.
-            
+            html2text_config: A dictionary with configuration options for the html2text library for markdown. View options here: https://github.com/Alir3z4/html2text/blob/master/docs/usage.md
+
         Returns:
             The extracted main content as a string.
         """
         valid_formats = ["html", "text", "markdown"]
-        
+
         if output_format not in valid_formats:
-            raise ValueError(f"Invalid output_format: {output_format}. Valid formats are: {', '.join(valid_formats)}.")
-    
+            raise ValueError(f"Invalid output_format: {output_format}. Valid formats are: "
+                 f"{', '.join(valid_formats)}.")
+
         soup = BeautifulSoup(html, "html.parser")
-        soup = MainContentExtractor._remove_elements(soup, REMOVE_ELEMENT_LIST_DEFAULT)
+        soup = MainContentExtractor._remove_elements(
+            soup, REMOVE_ELEMENT_LIST_DEFAULT)
 
         main_content = soup.find("main")
 
@@ -80,13 +84,18 @@ class MainContentExtractor:
 
             if output_format == "text":
                 return soup.get_text(strip=True)
-            
+
             if include_links == False:
-                soup = MainContentExtractor._remove_elements_keep_text(soup, ["a","img"])
+                soup = MainContentExtractor._remove_elements_keep_text(soup, [
+                                                                       "a", "img"])
             if output_format == "html":
                 return soup.prettify()
             elif output_format == "markdown":
-                return html2text(str(soup))
+                # Convert HTML to Markdown using html2text with configuration
+                mdconverter = html2text.HTML2Text(
+                    **html2text_kwargs
+                )
+                return mdconverter.handle(str(soup))
 
     def extract_links(html_content: str, **kwargs) -> dict:
         """
