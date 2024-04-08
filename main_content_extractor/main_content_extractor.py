@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup, Tag
 from typing import List, Union
-import html2text
+from html2text import html2text
 from .trafilatura_extends import TrafilaturaExtends
 
 REMOVE_ELEMENT_LIST_DEFAULT: List[str] = [
@@ -21,7 +21,7 @@ class MainContentExtractor:
         output_format: str = "html",
         include_links: bool = True,
         ref_extraction_method: dict = {},
-        **html2text_kwargs
+        skip_article: bool = False,
     ) -> str:
         """
         Extracts the main content from an HTML string.
@@ -31,8 +31,7 @@ class MainContentExtractor:
             output_format: The format of the extracted content (html, text, markdown).
             include_links: Whether to include links in the extracted content.
             ref_extraction_method: A dictionary to store the reference to the extraction method.
-            **html2text_kwargs: Additional keyword arguments to be passed to the html2text library for markdown conversion.
-                View options here: https://github.com/Alir3z4/html2text/blob/master/docs/usage.md
+            skip_article: Whether to skip the check for the <article> element and go straight to Trafilatura if there is no <main> element (false by default).
 
         Returns:
             The extracted main content as a string.
@@ -58,12 +57,13 @@ class MainContentExtractor:
             else:
                 result_html = str(main_content)
         else:
-            extraction_method = "article_element"
-            articles = soup.find_all("article")
+            if not skip_article:
+                extraction_method = "article_element"
+                articles = soup.find_all("article")
+                if articles:
+                    result_html = "".join(str(article) for article in articles)
 
-            if articles:
-                result_html = "".join(str(article) for article in articles)
-            else:
+            if not result_html:
                 main_content = MainContentExtractor._get_deepest_element_data(
                     soup, ["contents", "main"]
                 )
@@ -89,11 +89,7 @@ class MainContentExtractor:
             if output_format == "html":
                 return soup.prettify()
             elif output_format == "markdown":
-                # Convert HTML to Markdown using html2text with configuration
-                mdconverter = html2text.HTML2Text(
-                    **html2text_kwargs
-                )
-                return mdconverter.handle(str(soup))
+                return html2text(str(soup))
 
     def extract_links(html_content: str, **kwargs) -> dict:
         """
