@@ -21,6 +21,7 @@ class MainContentExtractor:
         output_format: str = "html",
         include_links: bool = True,
         ref_extraction_method: dict = {},
+        skip_article: bool = False,
     ) -> str:
         """
         Extracts the main content from an HTML string.
@@ -30,38 +31,39 @@ class MainContentExtractor:
             output_format: The format of the extracted content (html, text, markdown).
             include_links: Whether to include links in the extracted content.
             ref_extraction_method: A dictionary to store the reference to the extraction method.
-            
+            skip_article: Whether to skip the check for the <article> element and go straight to Trafilatura if there is no <main> element (false by default).
+
         Returns:
             The extracted main content as a string.
         """
         valid_formats = ["html", "text", "markdown"]
-        
         if output_format not in valid_formats:
-            raise ValueError(f"Invalid output_format: {output_format}. Valid formats are: {', '.join(valid_formats)}.")
-    
+            raise ValueError(f"Invalid output_format: {output_format}. Valid formats are: "
+                             f"{', '.join(valid_formats)}.")
+
         soup = BeautifulSoup(html, "html.parser")
-        soup = MainContentExtractor._remove_elements(soup, REMOVE_ELEMENT_LIST_DEFAULT)
+        soup = MainContentExtractor._remove_elements(
+            soup, REMOVE_ELEMENT_LIST_DEFAULT)
 
         main_content = soup.find("main")
-
         result_html = None
         extraction_method = None
 
         if main_content:
             extraction_method = "main_element"
             articles = main_content.find_all("article")
-
             if articles:
                 result_html = "".join(str(article) for article in articles)
             else:
                 result_html = str(main_content)
         else:
-            extraction_method = "article_element"
-            articles = soup.find_all("article")
+            if not skip_article:
+                extraction_method = "article_element"
+                articles = soup.find_all("article")
+                if articles:
+                    result_html = "".join(str(article) for article in articles)
 
-            if articles:
-                result_html = "".join(str(article) for article in articles)
-            else:
+            if not result_html:
                 main_content = MainContentExtractor._get_deepest_element_data(
                     soup, ["contents", "main"]
                 )
@@ -74,15 +76,16 @@ class MainContentExtractor:
 
         if result_html:
             soup = BeautifulSoup(result_html, "html.parser")
-
             if ref_extraction_method is not None:
                 ref_extraction_method["extraction_method"] = extraction_method
 
             if output_format == "text":
                 return soup.get_text(strip=True)
-            
-            if include_links == False:
-                soup = MainContentExtractor._remove_elements_keep_text(soup, ["a","img"])
+
+            if not include_links:
+                soup = MainContentExtractor._remove_elements_keep_text(soup, [
+                    "a", "img"])
+
             if output_format == "html":
                 return soup.prettify()
             elif output_format == "markdown":
