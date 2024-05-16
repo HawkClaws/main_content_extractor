@@ -1,6 +1,7 @@
 import re
-import xml.etree.ElementTree as ET
 import trafilatura
+from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
 
 class TrafilaturaExtends:
 
@@ -15,14 +16,17 @@ class TrafilaturaExtends:
         Returns:
             The extracted content as a string.
         """
-        data = trafilatura.extract(
-            html,
-            output_format="xml",
-            include_tables=True,
-            include_images=True,
-            include_links=True,
-        )
-
+        try:
+            data = trafilatura.extract(
+                html,
+                output_format="xml",
+                include_tables=True,
+                include_images=True,
+                include_links=True,
+            )
+        except Exception as e:
+            print("The error is: ", e)
+            return None
         if data == None:
             return None
         data = TrafilaturaExtends._replace_tags(data)
@@ -67,6 +71,8 @@ class TrafilaturaExtends:
     @staticmethod
     def _convert_xml_to_html(xml_string: str) -> str:
         # 解析してHTMLに変換
+        soup = BeautifulSoup(xml_string, 'lxml')
+        xml_string = soup.prettify()
         root = ET.fromstring(xml_string)
         title = root.get("title") or ""
         author = root.get("author") or ""
